@@ -10,7 +10,7 @@ if(isset($_REQUEST['entryid']) && $_REQUEST['entryid']!='') {
         <input type="hidden" name="wqentryid" id="wqentryid" value="<?=$_REQUEST['entryid']?>" />
         <div class="wqlabel">SLUG</div>
         <div class="wqfield">
-          <input type="text" class="wqtextfield" name="wqslug" id="wqslug" placeholder="Enter Plugin Slug" value="<?=$data->slug?>" />
+          <input type="text" class="wqtextfield" name="slug" id="wqslug" placeholder="Enter Plugin Slug" value="<?=$data->slug?>" />
         </div>
         <div id="wqslug_message" class="wqmessage"></div>
 
@@ -51,7 +51,7 @@ if(isset($_REQUEST['entryid']) && $_REQUEST['entryid']!='') {
                         <?php
                             foreach ($plugins as $plugin) {
 	                            ?>
-                                <option value="<?php echo $plugin->id ?>"><?php echo $plugin->slug ?></option>
+                                <option value="<?php echo $plugin->slug ?>"><?php echo $plugin->slug ?></option>
 	                            <?php
                             }
                         ?>
@@ -67,7 +67,7 @@ if(isset($_REQUEST['entryid']) && $_REQUEST['entryid']!='') {
                     <label>New Plugin</label>
                 </div>
                 <div class="col-75">
-                    <input type="text" class="wqtextfield" name="wqslug" id="wqslug" placeholder="Enter Plugin Slug Title" value="" />
+                    <input type="text" class="wqtextfield" name="slug" id="wqslug" placeholder="Enter Plugin Slug Title" value="" />
                     <div id="wqslug_message" class="wqmessage"></div>
                 </div>
             </div>
@@ -80,6 +80,7 @@ if(isset($_REQUEST['entryid']) && $_REQUEST['entryid']!='') {
         <p id="plugin_title" class="pmTableTitle"></p>
         <table id="pm_table">
             <thead>
+                <th>plugin</th>
                 <th>topic</th>
                 <th>post time</th>
                 <th>posted by</th>

@@ -42,10 +42,13 @@ function deactivate_plug_monitor_plugin_function() {
 }
 
 function load_custom_css_js( $page ) {
-    if ($page == 'toplevel_page_plugin-monitor'){
-	    wp_enqueue_style( 'my_custom_css', PLUG_MONITOR_PLUGIN_URL.'/css/style.css', false, '1.0.0' );
+	wp_enqueue_style( 'my_custom_css', PLUG_MONITOR_PLUGIN_URL.'/css/style.css', false, '1.0.0' );
+	if ($page == 'toplevel_page_plugin-monitor'){
 	    wp_enqueue_script( 'my_custom_script1', PLUG_MONITOR_PLUGIN_URL. '/js/custom.js' );
 	    wp_enqueue_script( 'pm_moment_js', PLUG_MONITOR_PLUGIN_URL. '/js/moment.js' );
+    }
+    if ($page == 'plugin-monitor_page_manage-plugin'){
+	    wp_enqueue_script( 'my_custom_script2', PLUG_MONITOR_PLUGIN_URL. '/js/manage_plugin.js' );
     }
 }
 add_action( 'admin_enqueue_scripts', 'load_custom_css_js' );
@@ -54,10 +57,16 @@ require_once(PLUG_MONITOR_PLUGIN_PATH.'/ajax/ajax_action.php');
 
 add_action('admin_menu', 'my_menu_pages');
 function my_menu_pages(){
-    add_menu_page('Plugin Monitor', 'Plugin Monitor', 'manage_options', 'plugin-monitor', 'my_menu_output' );}
+    add_menu_page('Plugin Monitor', 'Plugin Monitor', 'manage_options', 'plugin-monitor', 'my_menu_output' );
+	add_submenu_page('plugin-monitor', 'Plugin Monitor - New Plugins', 'New Plugin', 'manage_options', 'manage-plugin', 'new_plugin_page' );
+	add_submenu_page('plugin-monitor', 'Plugin Monitor - View Plugins', 'View Plugins', 'manage_options', 'view-plugin', 'my_submenu_output' );
+}
 
 function my_menu_output() {
   require_once(PLUG_MONITOR_PLUGIN_PATH.'/admin-templates/index.php');
+}
+function new_plugin_page() {
+  require_once(PLUG_MONITOR_PLUGIN_PATH.'/admin-templates/new_plugin.php');
 }
 
 if (!class_exists('WP_List_Table')) {
@@ -76,8 +85,7 @@ class EntryListTable extends WP_List_Table {
 
     function column_default($item, $column_name) {
         switch($column_name){
-          case 'action': echo '<a href="'.admin_url('admin.php?page=plugin-monitor&entryid='.$item['id']).'">Edit</a><br>
-                                <a href="'.admin_url('admin.php?page=plugin-monitor&entryid='.$item['id']).'">View Replies</a>';
+          case 'action': echo '<a href="'.admin_url('admin.php?page=manage-plugin&entryid='.$item['id']).'">Edit</a>';
         }
         return $item[$column_name];
     }

@@ -45,6 +45,8 @@ jQuery(document).ready(function($){
 
     var wqslug = $('#wqslug').val();
 
+    alert('asdasdas');
+
     if(wqslug=='') {
       $('#wqslug_message').html('Slug is Required');
     }
@@ -72,57 +74,62 @@ jQuery(document).ready(function($){
 
   $(document).on('change','#plugin, #hour_before', function(e) {
     e.preventDefault();
-
-    var plugin = $('#plugin').val();
-
-    var hour_before = $('#hour_before').val();
-    if (hour_before == "") {
-        alert('Hour field is required');
-        return false;
-    }
-
-    $.ajax({
-      data: {
-          plugin: plugin,
-          hour_before: hour_before,
-          action: 'wqplugin_data_fetch'
-      },
-      type: 'GET',
-      url: ajaxurl,
-      success: function(response) {
-          $('#plugin_title').text('');
-          $('#plugin_issue_table').empty();
-          let htmlString = '<tr>' +
-              '<td colspan="4">NO DATA AVAILABLE</td></tr>';
-
-          let result = JSON.parse(response);
-          if (result.rescode === 200) {
-
-              if (result.data.plugin_title === 'WordPress.org Forums » All Topics'){
-                  alert('Plugin not found! Please recheck the slug of plugin');
-              } else{
-                  $('#plugin_title').text(result.data.plugin_title);
-              }
-
-              if (result.data.issues.length > 0) {
-                  htmlString = '';
-                  for (let i = 0; i < result.data.issues.length; i++) {
-                      htmlString += '<tr>' +
-                          '<td><a target="_blank" href="' + result.data.issues[i].link + '">' + result.data.issues[i].title + '</a></td>' +
-                          '<td>' + result.data.issues[i].pubDate +'( '+moment(result.data.issues[i].pubDate).fromNow()+' )'+ '</td>' +
-                          '<td>' + result.data.issues[i].creator + '</td>' +
-                          '</tr>';
-                  }
-              }
-          }else{
-              alert(response);
-          }
-
-          $('#plugin_issue_table').append(htmlString);
-      }
-    });
+      requestToFetchData();
   });
 
+  function requestToFetchData() {
+      var plugin = $('#plugin').val();
 
+      var hour_before = $('#hour_before').val();
+      if (hour_before === "" || !hour_before) {
+          return false;
+      }
 
+      $.ajax({
+          data: {
+              plugin: plugin,
+              hour_before: hour_before,
+              action: 'wqplugin_data_fetch'
+          },
+          type: 'GET',
+          url: ajaxurl,
+          success: function (response) {
+              appendPluginInfoTableData(response);
+          }
+      });
+  }
+
+  function appendPluginInfoTableData(response) {
+    $('#plugin_issue_table').empty();
+    let htmlString = '<tr><td colspan="4">NO DATA AVAILABLE</td></tr>';
+
+    let result = JSON.parse(response);
+
+    if (result.length > 0){
+        htmlString = '';
+        for (let i = 0; i < result.length; i++) {
+            if (result[i].issues.length > 0) {
+                for (let j = 0; j < result[i].issues.length; j++) {
+                    let rowSpanElement = '';
+                    if (j === 0){
+                        rowSpanElement = '<td rowspan="'+result[i].issues.length+'">' + result[i].issues[j].slug + '</td>';
+                    }
+                    htmlString += '<tr>' +
+                        rowSpanElement+
+                        '<td><a target="_blank" href="' + result[i].issues[j].link + '">' + result[i].issues[j].title + '</a></td>' +
+                        '<td>' + result[i].issues[j].pubDate + '( ' + moment(result[i].issues[j].pubDate).fromNow() + ' )' + '</td>' +
+                        '<td>' + result[i].issues[j].creator + '</td>' +
+                        '</tr>';
+                }
+            }else{
+                htmlString += '<tr><td>'+result[i].slug+'</td><td colspan="3">'+result[i].status+'</td></tr>';
+            }
+        }
+    }
+
+    $('#plugin_issue_table').append(htmlString);
+  }
+
+    requestToFetchData();
 });
+
